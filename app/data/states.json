@@ -1,0 +1,11 @@
+{
+  "name": "state-lists",
+  "version": "0.0.1",
+
+  "data": [
+    {"name":"Andhra Pradesh", "district": ["a", "b"]},
+    {"name":"Maharashtra", "district": ["a", "b"]},
+    {"name":"Dadra and Nagar Haveli", "district": ["a", "b"]},
+    {"name":"Madhya Pradesh", "district": ["a", "b"]}
+  ]
+}

@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="state-check-box">
+
+
+    <template>
+        <iron-ajax
+                auto
+                url="../data/min/statesmin.json"
+                handle-as="json"
+                on-response="handleResponse"
+                last-response="{{states}}"
+                debounce-duration="300"></iron-ajax>
+        <paper-dropdown-menu label="State">
+            <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{states.data}}" as="state">
+                    <paper-item>{{state.name}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+    </template>
+    <script>
+        (function(){
+            'use strict';
+
+            Polymer({
+                is: 'state-check-box',
+                handleResponse: function(data) {
+                    console.log(data.srcElement.lastResponse.data)
+                }
+            });
+        })();
+    </script>
+</dom-module>
