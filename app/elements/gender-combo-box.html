@@ -1,0 +1,33 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="gender-combo-box">
+    <template>
+        <paper-dropdown-menu label="Gender">
+            <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{genders}}" as="gender">
+                    <paper-item>{{gender}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+    </template>
+    <script>
+    (function(){
+        'use strict';
+
+        Polymer({
+            is : 'gender-combo-box',
+            properties: {
+                genders: {
+                    type: Array,
+                    value: function() {
+                        return ['Male', 'Female', 'Transgender']
+                    }
+                }
+            }
+        });
+    })();
+    </script>
+</dom-module>
