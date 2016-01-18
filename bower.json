@@ -1,0 +1,30 @@
+{
+  "name": "Polymer Demo",
+  "description": "The demo for making passport app",
+  "main": "index.html",
+  "moduleType": [],
+  "keywords": [
+    "Polymer",
+    "Demo"
+  ],
+  "authors": [
+    "Zaid Hoona"
+  ],
+  "license": "MIT",
+  "homepage": "index.html",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#1.2.0",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#~1.1.2",
+    "paper-menu": "PolymerElements/paper-menu#~1.2.2",
+    "paper-item": "PolymerElements/paper-item#~1.1.3",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.1.1"
+  }
+}
