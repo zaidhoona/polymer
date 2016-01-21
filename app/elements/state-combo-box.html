@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="state-check-box">
+
+    <template>
+        <iron-ajax
+                auto
+                url="../data/min/statesmin.json"
+                handle-as="json"
+                last-response="{{response}}"
+                debounce-duration="300"></iron-ajax>
+        <paper-dropdown-menu id="stateSelector" label="State" on-iron-select="onStateChange">
+            <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{states}}" as="state">
+                    <paper-item>{{state.name}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+
+        <paper-dropdown-menu id="districtSelector" label="Distrct" hidden$="{{!showDistrict}}">
+            <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{districts}}" as="district">
+                    <paper-item>{{district}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+    </template>
+
+    <script>
+        (function(){
+            'use strict';
+
+            Polymer({
+                is: 'state-check-box',
+                properties: {
+
+                    /**
+                     * If {@code true} shows the district selector else hidden
+                     * */
+                    showDistrict: {
+                        type: Boolean,
+                        value: false
+                    },
+
+                    /**
+                     * Contains the data of the various states
+                     * */
+                    states: {
+                        type: Array,
+                        value: function() {
+                            return [];
+                        }
+                    },
+
+                    /**
+                     * List of districts of selected states
+                     * */
+                    districts: {
+                        type: Array,
+                        value: function() {
+                            return [];
+                        }
+                    },
+
+                    response: {
+                        type: Object,
+                        value: function() {
+                            return {};
+                        }
+                    }
+                },
+
+                observers: [
+                        'responseReceived(response)'
+                ],
+
+                /**
+                 * Fetches the districts of the selected state and populates the district selector
+                 * */
+                getDistricts: function(stateName) {
+                    for(var i=0; i < this.states.length; ++i) {
+                        if (this.states[i].name === stateName) {
+                            return this.states[i].district;
+                        }
+                    }
+                    return [];
+                },
+
+                /**
+                 * Triggered when selected item changes
+                 *
+                 * @event state item selected
+                 * */
+                onStateChange: function(event, item) {
+                    this.clearDistrict();
+                    var selectedState = item.item.textContent.trim();
+                    this.districts = this.getDistricts(selectedState);
+                },
+
+                /**
+                 * Clear the district selection
+                 */
+                clearDistrict: function() {
+                    var districtSelector = document.querySelector('#districtSelector');
+                    districtSelector._selectedItemChanged(null);
+                },
+
+                responseReceived: function(response) {
+                    this.states = response.data;
+                }
+            });
+        })();
+    </script>
+</dom-module>
