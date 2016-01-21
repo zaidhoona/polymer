@@ -6,31 +6,72 @@
 
 <dom-module id="state-check-box">
 
-
     <template>
         <iron-ajax
                 auto
                 url="../data/min/statesmin.json"
                 handle-as="json"
                 on-response="handleResponse"
-                last-response="{{states}}"
                 debounce-duration="300"></iron-ajax>
-        <paper-dropdown-menu label="State">
+        <paper-dropdown-menu id="stateSelector" label="State" on-iron-select="onStateChange">
             <paper-menu class="dropdown-content">
-                <template is="dom-repeat" items="{{states.data}}" as="state">
+                <template is="dom-repeat" items="{{states}}" as="state">
                     <paper-item>{{state.name}}</paper-item>
                 </template>
             </paper-menu>
         </paper-dropdown-menu>
+
+        <paper-dropdown-menu id="districtSelector" label="Distrct" hidden$="{{!showDistrict}}">
+            <paper-menu class="dropdown-content">
+                <template is="dom-repeat" items="{{districts}}" as="district">
+                    <paper-item>{{district}}</paper-item>
+                </template>
+            </paper-menu>
+        </paper-dropdown-menu>
     </template>
+
     <script>
         (function(){
             'use strict';
 
             Polymer({
                 is: 'state-check-box',
+                properties: {
+                    showDistrict: {
+                        type: Boolean,
+                        value: false
+                    },
+                    states: {
+                        type: Array,
+                        value: function() {
+                            return [];
+                        }
+                    },
+                    districts: {
+                        type: Array,
+                        value: function() {
+                            return [];
+                        }
+                    }
+                },
                 handleResponse: function(data) {
-                    console.log(data.srcElement.lastResponse.data)
+                    this.states = data.srcElement.lastResponse.data;
+                },
+                getDistricts: function(stateName) {
+                    for(var i=0; i < this.states.length; ++i) {
+                        if (this.states[i].name === stateName) {
+                            return this.states[i].district;
+                        }
+                    }
+                    return [];
+                },
+                onStateChange: function(event, item) {
+                    this.clearDistrict();
+                    var selectedState = item.item.textContent.trim();
+                    this.districts = this.getDistricts(selectedState);
+                },
+                clearDistrict: function() {
+                    document.querySelector('#districtSelector')._selectedItemChanged(null);
                 }
             });
         })();
