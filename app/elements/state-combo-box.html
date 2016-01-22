@@ -4,7 +4,7 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
-<dom-module id="state-check-box">
+<dom-module id="state-combo-box">
 
     <template>
         <iron-ajax
@@ -13,17 +13,17 @@
                 handle-as="json"
                 last-response="{{response}}"
                 debounce-duration="300"></iron-ajax>
-        <paper-dropdown-menu id="stateSelector" label="State" on-iron-select="onStateChange">
+        <paper-dropdown-menu id="stateSelector" label="State" on-iron-select="_onStateChange">
             <paper-menu class="dropdown-content">
-                <template is="dom-repeat" items="{{states}}" as="state">
+                <template is="dom-repeat" items="{{response.data}}" as="state">
                     <paper-item>{{state.name}}</paper-item>
                 </template>
             </paper-menu>
         </paper-dropdown-menu>
 
-        <paper-dropdown-menu id="districtSelector" label="Distrct" hidden$="{{!showDistrict}}">
+        <paper-dropdown-menu id="districtSelector" label="Distrct" on-iron-select="_onDistrictChange" hidden$="{{!showDistrict}}">
             <paper-menu class="dropdown-content">
-                <template is="dom-repeat" items="{{districts}}" as="district">
+                <template is="dom-repeat" items="{{getDistricts(response.data, state)}}" as="district">
                     <paper-item>{{district}}</paper-item>
                 </template>
             </paper-menu>
@@ -35,7 +35,7 @@
             'use strict';
 
             Polymer({
-                is: 'state-check-box',
+                is: 'state-combo-box',
                 properties: {
 
                     /**
@@ -47,44 +47,32 @@
                     },
 
                     /**
-                     * Contains the data of the various states
-                     * */
-                    states: {
-                        type: Array,
-                        value: function() {
-                            return [];
-                        }
-                    },
-
-                    /**
-                     * List of districts of selected states
-                     * */
-                    districts: {
-                        type: Array,
-                        value: function() {
-                            return [];
-                        }
-                    },
-
-                    response: {
+                     * The value for this element that will be used when submitting in
+                     * a form.
+                     */
+                    value: {
                         type: Object,
                         value: function() {
                             return {};
-                        }
-                    }
-                },
+                        },
+                        computed: '_computeValue(state, district)'
+                    },
 
-                observers: [
-                        'responseReceived(response)'
-                ],
+                    state: Object,
+
+                    district: Object
+                },
 
                 /**
                  * Fetches the districts of the selected state and populates the district selector
+                 *
+                 * @param states array of states
+                 * @param state selected state
                  * */
-                getDistricts: function(stateName) {
-                    for(var i=0; i < this.states.length; ++i) {
-                        if (this.states[i].name === stateName) {
-                            return this.states[i].district;
+                getDistricts: function(states, state) {
+                    for(var i=0; i < states.length; ++i) {
+                        if (states[i].name === state) {
+                            return states[i].district;
                         }
                     }
                     return [];
@@ -94,23 +82,62 @@
                  * Triggered when selected item changes
                  *
                  * @event state item selected
+                 *
+                 * @param event select event
+                 * @param item the property selected
                  * */
-                onStateChange: function(event, item) {
+                _onStateChange: function(event, item) {
                     this.clearDistrict();
-                    var selectedState = item.item.textContent.trim();
-                    this.districts = this.getDistricts(selectedState);
+                    this.state = this.getStateSelector().selectedItemLabel;
+                    this.district = null;
+                },
+
+                /**
+                 * Triggered when selected item changes
+                 *
+                 * @event state item selected
+                 *
+                 * @param event select event
+                 * @param item the property selected
+                 * */
+                _onDistrictChange: function(event, item) {
+                    this.district = this.getDistrictSelector().selectedItemLabel;
                 },
 
                 /**
                  * Clear the district selection
                  */
                 clearDistrict: function() {
-                    var districtSelector = document.querySelector('#districtSelector');
-                    districtSelector._selectedItemChanged(null);
+                    this.getDistrictSelector()._selectedItemChanged(null);
                 },
 
-                responseReceived: function(response) {
-                    this.states = response.data;
+                /**
+                 * Comptes the value to be returned to the form element
+                 * */
+                _computeValue: function(state, district) {
+                    if (this.showDistrict) {
+                        return {"state": state, "district": district};
+                    } else {
+                        return {"state": state};
+                    }
+                },
+
+                /**
+                 * Returns the district drop-down element
+                 *
+                 * @returns {Element} district drop-down
+                 */
+                getDistrictSelector() {
+                    return document.querySelector('#districtSelector');
+                },
+
+                /**
+                 * Returns the state drop-down element
+                 *
+                 * @returns {Element} state drop-down
+                 */
+                getStateSelector() {
+                    return document.querySelector('#stateSelector');
                 }
             });
         })();
